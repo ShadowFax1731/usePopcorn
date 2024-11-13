@@ -50,12 +50,11 @@ const tempWatchedData = [
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
-function Navbar({ movies }) {
+function Navbar({ children }) {
   return (
     <nav className="nav-bar">
       <Logo />
-      <Input />
-      <NumberOfResults movies={movies} />
+      {children}
     </nav>
   );
 }
@@ -91,13 +90,8 @@ function Input() {
   );
 }
 
-function Main({ movies }) {
-  return (
-    <main className="main">
-      <MoviesListBox movies={movies} />
-      <WatchListBox />
-    </main>
-  );
+function Main({ children }) {
+  return <main className="main">{children}</main>;
 }
 
 function List({ movies }) {
@@ -125,7 +119,7 @@ function Movie({ movie }) {
   );
 }
 
-function MoviesListBox({ movies }) {
+function MoviesListBox({ children }) {
   const [isOpen1, setIsOpen1] = useState(true);
 
   return (
@@ -136,7 +130,7 @@ function MoviesListBox({ movies }) {
       >
         {isOpen1 ? "–" : "+"}
       </button>
-      {isOpen1 && <List movies={movies} />}
+      {isOpen1 && children}
     </div>
   );
 }
@@ -229,8 +223,16 @@ export default function App() {
 
   return (
     <>
-      <Navbar movies={movies} />
-      <Main movies={movies} />
+      <Navbar>
+        <Input />
+        <NumberOfResults movies={movies} />
+      </Navbar>
+      <Main>
+        <MoviesListBox>
+          <List movies={movies} />
+        </MoviesListBox>
+        <WatchListBox />
+      </Main>
     </>
   );
 }
