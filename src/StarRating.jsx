@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
 
 const containerStyle = {
   display: "flex",
@@ -104,3 +105,22 @@ function Star({ onClick, full, onHoverIn, onHoverOut, color, size }) {
     </span>
   );
 }
+
+StarRating.propTypes = {
+  maxRating: PropTypes.number,
+  color: PropTypes.string,
+  size: PropTypes.number,
+  className: PropTypes.string,
+  messages: PropTypes.array,
+  defaultRating: PropTypes.number,
+  onSetRating: PropTypes.func,
+};
+
+Star.propTypes = {
+  onClick: PropTypes.func,
+  full: PropTypes.bool,
+  onHoverIn: PropTypes.func,
+  onHoverOut: PropTypes.func,
+  color: PropTypes.string,
+  size: PropTypes.number,
+};
