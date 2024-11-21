@@ -197,23 +197,41 @@ function Loader() {
   return <p className="loader">Loading...</p>;
 }
 
+function ErrorMessage({ message }) {
+  return <p className="error">{message}</p>;
+}
+
 const KEY = `fb1d9a7c`;
 
 export default function App() {
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
-  const [loadind, setLoading] = useState(false);
-  const query = "interstellar";
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const query = "asdasdasd";
 
   useEffect(function () {
     async function fetchMovies() {
-      setLoading(true);
-      const res = await fetch(
-        `https://www.omdbapi.com/?i=tt3896198&apikey=${KEY}&s=${query}`
-      );
-      const data = await res.json();
-      setMovies(data.Search);
-      setLoading(false);
+      try {
+        setLoading(true);
+        const res = await fetch(
+          `https://www.omdbapi.com/?i=tt3896198&apikey=${KEY}&s=${query}`
+        );
+
+        if (!res.ok) throw new Error("Something went wrong... :/");
+
+        const data = await res.json();
+
+        if (data.Response === "False")
+          throw new Error("No movies found for the query string");
+
+        setMovies(data.Search);
+        setLoading(false);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
     }
     fetchMovies();
   }, []);
@@ -225,7 +243,11 @@ export default function App() {
         <NumberOfResults movies={movies} />
       </Navbar>
       <Main>
-        <Box>{loadind ? <Loader /> : <List movies={movies} />}</Box>
+        <Box>
+          {loading && <Loader />}
+          {!loading && !error && <List movies={movies} />}
+          {error && <ErrorMessage message={error} />}
+        </Box>
 
         <Box>
           <Summary watched={watched} />
