@@ -193,20 +193,27 @@ function Summary({ watched }) {
   );
 }
 
+function Loader() {
+  return <p className="loader">Loading...</p>;
+}
+
 const KEY = `fb1d9a7c`;
 
 export default function App() {
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
+  const [loadind, setLoading] = useState(false);
   const query = "interstellar";
 
   useEffect(function () {
     async function fetchMovies() {
+      setLoading(true);
       const res = await fetch(
         `https://www.omdbapi.com/?i=tt3896198&apikey=${KEY}&s=${query}`
       );
       const data = await res.json();
       setMovies(data.Search);
+      setLoading(false);
     }
     fetchMovies();
   }, []);
@@ -218,9 +225,7 @@ export default function App() {
         <NumberOfResults movies={movies} />
       </Navbar>
       <Main>
-        <Box>
-          <List movies={movies} />
-        </Box>
+        <Box>{loadind ? <Loader /> : <List movies={movies} />}</Box>
 
         <Box>
           <Summary watched={watched} />
