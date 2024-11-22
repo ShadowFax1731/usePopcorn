@@ -76,9 +76,7 @@ function NumberOfResults({ movies }) {
   );
 }
 
-function Input() {
-  const [query, setQuery] = useState("");
-
+function Input({ query, setQuery }) {
   return (
     <input
       className="search"
@@ -208,38 +206,65 @@ export default function App() {
   const [watched, setWatched] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const query = "asdasdasd";
+  const [query, setQuery] = useState("");
 
-  useEffect(function () {
-    async function fetchMovies() {
-      try {
-        setLoading(true);
-        const res = await fetch(
-          `https://www.omdbapi.com/?i=tt3896198&apikey=${KEY}&s=${query}`
-        );
-
-        if (!res.ok) throw new Error("Something went wrong... :/");
-
-        const data = await res.json();
-
-        if (data.Response === "False")
-          throw new Error("No movies found for the query string");
-
-        setMovies(data.Search);
-        setLoading(false);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchMovies();
+  /*
+  useEffect(() => {
+    console.log("After initial render");
   }, []);
+
+  useEffect(() => {
+    console.log("After each render");
+  });
+
+  useEffect(() => {
+    console.log("After query state change render");
+  }, [query]);
+
+  console.log("During render");
+  */
+
+  useEffect(
+    function () {
+      async function fetchMovies() {
+        try {
+          setLoading(true);
+          setError("");
+          const res = await fetch(
+            `https://www.omdbapi.com/?i=tt3896198&apikey=${KEY}&s=${query}`
+          );
+
+          if (!res.ok) throw new Error("Something went wrong... :/");
+
+          const data = await res.json();
+
+          if (data.Response === "False")
+            throw new Error("No movies found for the query string");
+
+          setMovies(data.Search);
+          setLoading(false);
+        } catch (error) {
+          setError(error.message);
+        } finally {
+          setLoading(false);
+        }
+      }
+
+      if (query.length < 3) {
+        setMovies([]);
+        setError("");
+        return;
+      }
+
+      fetchMovies();
+    },
+    [query]
+  );
 
   return (
     <>
       <Navbar>
-        <Input />
+        <Input query={query} setQuery={setQuery} />
         <NumberOfResults movies={movies} />
       </Navbar>
       <Main>
