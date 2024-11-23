@@ -216,6 +216,17 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
 
   useEffect(
     function () {
+      if (!title) return;
+      document.title = `Movie | ${title}`;
+
+      return () => (document.title = "usePopcorn"); //cleanup function
+      //if we log title inside the cleanup function it will remember the title because of closures
+    },
+    [title]
+  );
+
+  useEffect(
+    function () {
       async function getMovieDetails() {
         setLoading(true);
         const res = await fetch(
