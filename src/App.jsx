@@ -181,6 +181,20 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
   const [loading, setLoading] = useState(false);
   const [userRating, setUserRating] = useState(0);
 
+  useEffect(
+    function () {
+      const callback = (e) => {
+        if (e.code === "Escape") {
+          onCloseMovie();
+        }
+      };
+      document.addEventListener("keydown", callback);
+
+      return () => document.removeEventListener("keydown", callback);
+    },
+    [onCloseMovie]
+  );
+
   const isWatched = watched.map((movie) => movie.imdbID).includes(selectedId);
 
   const watchedUserRating = watched.find(
@@ -302,7 +316,6 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
 }
 
 function Summary({ watched }) {
-  // console.log("Summary", watched);
   const avgImdbRating = average(watched.map((movie) => movie.imdbRating));
   const avgUserRating = average(watched.map((movie) => movie.userRating));
   const avgRuntime = average(watched.map((movie) => movie.runtime));
@@ -417,6 +430,7 @@ export default function App() {
         return;
       }
 
+      closeMovieDetails();
       fetchMovies();
 
       return () => controller.abort();
