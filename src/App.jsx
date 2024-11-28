@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import StarRating from "./StarRating";
+import { useMovies } from "./useMovies";
 
 const KEY = `fb1d9a7c`;
 
@@ -333,11 +334,9 @@ function ErrorMessage({ message }) {
 }
 
 export default function App() {
-  const [movies, setMovies] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(null);
+  const { movies, error, loading } = useMovies(query, closeMovieDetails);
 
   // const [watched, setWatched] = useState([]);
   const [watched, setWatched] = useState(() => {
@@ -380,51 +379,6 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("watched", JSON.stringify([...watched]));
   }, [watched]);
-
-  useEffect(
-    function () {
-      const controller = new AbortController();
-
-      async function fetchMovies() {
-        try {
-          setLoading(true);
-          setError("");
-          const res = await fetch(
-            `https://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
-            { signal: controller.signal }
-          );
-
-          if (!res.ok) throw new Error("Something went wrong... :/");
-
-          const data = await res.json();
-
-          if (data.Response === "False")
-            throw new Error("No movies found for the query string");
-
-          setMovies(data.Search);
-          setError("");
-        } catch (error) {
-          if (error.name !== "AbortError") {
-            setError(error.message);
-          }
-        } finally {
-          setLoading(false);
-        }
-      }
-
-      if (query.length < 3) {
-        setMovies([]);
-        setError("");
-        return;
-      }
-
-      closeMovieDetails();
-      fetchMovies();
-
-      return () => controller.abort();
-    },
-    [query]
-  );
 
   return (
     <>
